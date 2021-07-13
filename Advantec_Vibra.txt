@@ -1,0 +1,44 @@
+Déterminer le comportement nominal de n'importe quelle source industrielle.
+Mathématiquement ou ml non supervisé puis méthode de RL.
+fonctionnement nominal ou panne ?
+Appareillage qui émet vibration (elec ou méca ou hydro)
+Quels para ?
+Axes, 
+sur prédictas, vibrations, rms, ultrasons, axes, hertz, température
+Ultrasons, premier niveau d'alerte
+Faire générique, résonance mauvais signe : atténuation ou augmentation, croiss et décroiss sans plateau
+attention aux cycles jour / nuit
+trous de données à ne pas intégrer, confirmation de mesures, attendre au moins 3... A voir
+Exportation des données .csv
+croiser d'autres données car ils ne donnent pas de données quand c'est éteint.
+Volumétrie : 200 mesures par jour (1 mois)
+Générique basé sur 1 capteur dans 1 premier temps.
+puis pourquoi pas 2 
+predictas et advantec
+dérive ? != prédiction ?
+Prédire la panne pas juste une trend
+Pas de panne souvent
+mais maintenance durant lesquelles plus de données
+détecter fonctionnements anormaux --> détection de pannes.
+Maintenance programmées même quand pas de besoin.
+predictas de base 2 capteurs mais 1 en panne.
+Advantec : 15 juillet
+Affiner avec d'autres données par la suite (temp, hygro, accéléromètre)
+données de device inconnu
+
+
+SELECT CEILING(Total_InnoDB_Bytes*1.6/POWER(1024,3)) RIBPS FROM
+(SELECT SUM(data_length+index_length) Total_InnoDB_Bytes
+FROM information_schema.tables WHERE engine='InnoDB') A;
+
+Questions :
+Ultrasons CFCTR : à quoi correspond "CFCTR" ? Unité en Hz ?
+Température TOTAL : relevée à quel niveau ? moyenne T IR et T Ambiante ? 
+Vibration TOTAL : correspond à ?
+Activité Activity : 1 = up, 0 = down ?
+Compteur COUNT : dénombre quoi ? différence avec COUNT ?
+Compteur STARTUP_TIMES : dénombre quoi ?
+
+
+Détecter écart acceptable 
+

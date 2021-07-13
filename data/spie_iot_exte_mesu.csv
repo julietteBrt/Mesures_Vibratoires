@@ -1,0 +1,18 @@
+C_Mesu;T_Mesu;C_Equi;T_Type;T_Unit
+3023;Ultrason CFCTR;61;decimal;NULL
+3022;Température TOTAL;61;decimal;°C
+3021;Vibration TOTAL;61;decimal;mm/s
+3020;Compteur Count;61;decimal;unit
+3019;Magnitude Y;61;decimal;
+3018;Frequence rotation_speed;61;decimal;Hz
+3017;Durée WORK_TIME;61;decimal;h
+3016;Compteur STARTUP_TIMES;61;decimal;count
+3015;Activité Activity;61;decimal;unit
+3014;Température IR;61;decimal;°C
+3013;Vibration Z;61;decimal;mm/s
+3012;Vibration Y;61;decimal;mm/s
+3011;Vibration X;61;decimal;mm/s
+3010; COUNT;61;decimal;unit
+3009;Température Ambiante;61;decimal;°C
+3008;Ultrason p2p;61;decimal;mv
+3007;Ultrason RMS;61;decimal;dBµV
