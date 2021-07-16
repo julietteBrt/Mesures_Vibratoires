@@ -1,6 +1,6 @@
 import progressbar
 from pandas import read_csv, concat, DataFrame
-from scaler import Scaler
+#from scaler import Scaler
 
 import pandas as pd
 import numpy as np
@@ -24,8 +24,8 @@ def csv_to_pandas(fileName, chunksize):
 class Dataset:
     def __init__(self):
         self.dataset_is_ready = False
-        self.list_train_X = None
-        self.list_train_y = None
+        """self.list_train_X = None
+        self.list_train_y = None"""
         self.config = None
         self.nb_possibility = None
         self.info_goal = {}
@@ -34,16 +34,17 @@ class Dataset:
     def set(self, config, data):
         if data is not None:
             self.config = config
-            self.create_dataset(data)
+            #self.create_dataset(data)
+            self.data = data
             self.dataset_is_ready = True
             self.config['list_info_status'] = self.list_info_status
-            self.config['nb_entries'] = self.list_train_X.shape[2]
+            #self.config['nb_entries'] = self.list_train_X.shape[2]
             self.config['nb_possibility'] = self.nb_possibility
             return self.config
         else:
             self.config = config
-            self.scaler_in = Scaler(load = self.config['scaler_in_save'])
-            self.scaler_out = Scaler(load = self.config['scaler_out_save'])
+            """self.scaler_in = Scaler(load = self.config['scaler_in_save'])
+            self.scaler_out = Scaler(load = self.config['scaler_out_save'])"""
 
     def generate_batches(self, file_name):
         lookback = self.config['lookback']
@@ -104,14 +105,14 @@ class Dataset:
         return result
 
 
-    def get_a_percent_of_dataset(self, percent_data):
-        nb_data_to_take = int(self.list_train_X.shape[0]*percent_data/100)
-        return self.list_train_X[:nb_data_to_take], self.list_train_y[:nb_data_to_take]
+    def get_dataset(self):
+        #nb_data_to_take = int(self.list_train_X.shape[0]*tol/100)
+        return self.list_train_X[:]
 
-    def get_scaler_save(self):
+    """def get_scaler_save(self):
         scaler_in_save = self.scaler_in.get_save()
         scaler_out_save = self.scaler_out.get_save()
-        return scaler_in_save, scaler_out_save
+        return scaler_in_save, scaler_out_save"""
 
     def clean_data(self, data_in):
         """suppression des colonnes inutiles
@@ -180,17 +181,13 @@ class Dataset:
                 info = {'name':column_name, 'rank':rank}
                 self.list_info_status.append(info)
                 rank +=1
-            if str(column_format) == 'goal' and mode == 'classification':
-                info = {'name':column_name, 'rank':rank}
-                self.list_info_status.append(info)
-                rank +=1
 
-        # enlèvement des colonne 'disable' et trie par date si présence d'une colonne 'timestamp'
+        # enlèvement des colonnes 'disable' et tri par date si présence d'une colonne 'timestamp'
         data_cleaned = self.clean_data(data.copy())
 
         # enlève la colonne 'timestamp'
-        if data_cleaned.columns.tolist().count('timestamp') != 0:
-            del data_cleaned['timestamp']
+        """if data_cleaned.columns.tolist().count('timestamp') != 0:
+            del data_cleaned['timestamp']"""
 
         quality_column_goal = None
         list_quality_column = []
@@ -198,10 +195,6 @@ class Dataset:
         for i, name in enumerate(data_cleaned.columns.tolist()):
             if str(name) == 'status':
                 list_quality_column.append(data_cleaned.iloc[:, i])
-                list_quality_column_num.append(i)
-            if str(name) == 'goal' and mode == 'classification':
-                list_quality_column.append(data_cleaned.iloc[:, i])
-                quality_column_goal = data_cleaned.iloc[:, i]
                 list_quality_column_num.append(i)
 
         list_data_one_hot = []
@@ -227,17 +220,17 @@ class Dataset:
             data_cleaned = data_cleaned.join(goal_one_hot)
 
         del list_data_one_hot
-
+        print(f'DATASET: {type(data_cleaned)}')
         return data_cleaned
 
     def create_dataset(self, data):
-        data_cleaned =self.set_data(data.copy())
+        data_cleaned = self.set_data(data.copy())
         # génére les dataset
-        data_split = self.split_at_nan_value(data_cleaned)
+        """data_split = self.split_at_nan_value(data_cleaned)
         nb_data_split = len(data_split)
         print("Conversion des données en dataset...")
         bar = progressbar.ProgressBar(max_value=len(data_split)).start()
-        for index,split in enumerate(data_split):
+        for index, split in enumerate(data_split):
             if index != 0:
                 train_X, train_y = self.dataToDataset(split, self.config['lookahead'])
                 np.save("numpy/X/train_X_"+str(index), train_X)
@@ -251,9 +244,9 @@ class Dataset:
                 del train_X
                 del train_y
             bar.update(index)
-        bar.finish()
+        bar.finish()"""
         
-        for i in range(nb_data_split):
+        """for i in range(nb_data_split):
             if i == 0:
                 self.list_train_X = np.load("numpy/X/train_X_"+str(i)+".npy")
                 self.list_train_y = np.load("numpy/Y/train_y_"+str(i)+".npy")
@@ -266,128 +259,5 @@ class Dataset:
         np.save("numpy/list_train_X", self.list_train_X)
         np.save("numpy/list_train_y", self.list_train_y)
 
-        all_files = glob("numpy/X/*.npy")+glob("numpy/Y/*.npy")
+        all_files = glob("numpy/X/*.npy")+glob("numpy/Y/*.npy")"""
 
-    def split_at_nan_value(self, data):
-        """convertie un dataFrame en plusieurs dataFrame qui ne sont jamais coupés par des cellules null
-        """
-        print("Split des données pour leur exploitation...")
-        lookback = self.config['lookback']
-        lookahead = self.config['lookahead']
-        list_split = []
-        list_temp = []
-        first_element = 0
-        current_element = 0
-        bar_statut = 0
-        bar = progressbar.ProgressBar(max_value=len(data.dropna())).start()
-        # parcours les elements sans colonne null
-        for index, row in data.dropna().iterrows():
-            if first_element != 0:
-                # si les numméro d'index se suivent
-                if current_element == index:
-                    current_element += 1
-                    list_temp.append(index)
-                else:
-                    # si la liste d'index est assez grande pour être utile, elle est gardée:
-                    if len(list_temp) > lookback+lookahead:
-                        list_split.append(list_temp[:])
-                    # recommence une liste
-                    list_temp[:] = []
-                    list_temp.append(index)
-                    current_element = index+1
-            # dans le premier cas de la boucle:
-            else:
-                first_element = index
-                current_element = index+1
-                list_temp.append(index)
-            bar_statut+=1
-            bar.update(bar_statut)
-        bar.finish()
-        if len(list_temp) > lookback+lookahead:
-            list_split.append(list_temp[:])
-        
-        data_split = []
-        for split in list_split:
-            data_split.append(data.iloc[split,:])
-        
-        del list_temp
-        del list_split
-        return(data_split)
-
-    def series_to_supervised(self, data, n_in=1, n_out=1, dropnan=True):
-        """convert series to supervised learning
-        """
-        try:
-            n_vars = 1 if type(data) is list else data.shape[1]
-        except:
-            n_vars = 1 if type(data) is list else data.shape[0]
-        df = DataFrame(data)
-        cols, names = list(), list()
-        # input sequence (t-n, ... t-1)
-        for i in range(n_in-1, -1, -1):
-            cols.append(df.shift(i))
-            names += [('var%d(t-%d)' % (j+1, i)) for j in range(n_vars)]
-        # forecast sequence (t-1, t, t+1, ... t+n)
-        for i in range(0, n_out):
-            cols.append(df.shift(-i))
-            if i == 0:
-                names += [('var%d(t)' % (j+1)) for j in range(n_vars)]
-            else:
-                names += [('var%d(t+%d)' % (j+1, i)) for j in range(n_vars)]
-        # put it all together
-        agg = concat(cols, axis=1)
-        # drop rows with NaN values
-        if dropnan:
-            agg.dropna(inplace=True)
-        return agg
-
-    def dataToDataset(self, train_pd, lookahead, first_time = False):
-        # values_x = train_pd.loc[:, train_pd.columns != 'goal']
-        values_x = train_pd
-        values_y = train_pd['goal']
-
-        lookback = self.config['lookback']
-        mode = self.config['mode']
-        nb_entries = len(values_x.columns)
-
-        # frame as supervised learning
-        reframed_x = self.series_to_supervised(values_x, lookback, 0)
-        reframed_x.drop(reframed_x.tail(lookahead).index,inplace=True)
-
-        values = reframed_x.values
-
-        if lookahead != 0:
-            reframed_y = self.series_to_supervised(values_y, 0, lookahead)
-            reframed_y.drop(reframed_y.head(lookback-1).index,inplace=True)
-
-            # mise en format ndarray
-            goals = reframed_y.values
-
-            # normalize features
-            if first_time:
-                self.scaler_in = Scaler(values)
-                self.scaler_out = Scaler(goals, line=True)
-            
-            scaled = self.scaler_in.rescale(values)
-            goals = self.scaler_out.rescale(goals)
-
-            train_X, train_y = scaled, goals
-            train_X = train_X.reshape(train_X.shape[0], 1, nb_entries*lookback)
-
-            self.nb_possibility = int(train_y.shape[1]/lookahead)
-
-            if mode == 'classification':
-                train_y = train_y.reshape(train_y.shape[0], lookahead, self.nb_possibility)
-            else:
-                train_y = train_y.reshape(train_y.shape[0], 1, lookahead)
-
-            del values
-            del reframed_x
-            del reframed_y
-            del goals
-            return train_X, train_y
-        else:
-            del reframed_x
-            scaled = self.scaler_in.rescale(values)
-            return scaled.reshape(scaled.shape[0], 1, nb_entries*lookback)
-{"mode":"full","isActive":false}

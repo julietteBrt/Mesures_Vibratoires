@@ -4,3 +4,5 @@ myenv
 
 # notebook
 .ipynb_checkpoints
+
+model/**

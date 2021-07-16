@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 import sys
+import pickle
 import random
 import json
 from pandas import DataFrame
@@ -17,14 +18,14 @@ import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 
-#from managementModel import ManagementModel
+from managementModel import ManagementModel
 
 def csv_to_pandas(fileName):
     with open(fileName) as f:
         firstLine = f.readline()
     nbComma = firstLine.count(',')
     nbSemicolon = firstLine.count(';')
-    if nbComma>nbSemicolon:
+    if nbComma > nbSemicolon:
         dataset = pd.read_csv(fileName)
     else:
         dataset = pd.read_csv(fileName, sep =";")
@@ -42,7 +43,7 @@ class App(QWidget):
         self.height = 1000
         self.init_UI()
         self.dialogWindow3 = None
-        #self.management_model = ManagementModel()
+        self.management_model = ManagementModel()
         
     def init_UI(self):
         self.setWindowTitle(self.title)
@@ -66,7 +67,7 @@ class App(QWidget):
         self.dialog.fileSelected.connect(self.drawSetData)
         self.dialog.fileSelected.connect(self.drawSetTrain)
         
-        # permettra d'avoir plusieurs fenetres
+        # enable multiple windows
         self.dialogs = list()
         
         self.show()
@@ -80,125 +81,111 @@ class App(QWidget):
         
     @pyqtSlot()
     def loadSaveModel(self):
-        """ Récuperation du .json de configuration
+        """ Récuperation du .pkl du modèle
         """
-        self.textbox_nb_epoch.setText("0")
+        #self.textbox_nb_epoch.setText("0")
         #permet de charger une sauvegarde pour le lstm, pas le embedding
         self.dialogs[0].hide()
         self.name_file_config = str(self.dialogs[0].dialog2.selectedFiles())[2:-2]
 
-        with open(self.name_file_config) as json_file: 
-            config = json.load(json_file)
+        with open(self.name_file_config, 'rb') as pkl_file: 
+            self.management_model.clustering_model = pickle.load(pkl_file)
 
-        name_file = config['name_goal']+'.h5'
+        """name_file = f"{config['name_goal']}.pkl"
         dir = os.path.dirname(self.name_file_config)
-        name_file_model = dir+'/'+name_file
+        name_file_model = f'{dir}/{name_file}'
 
-        model = 'hello' #tf.keras.models.load_model(name_file_model)
+        #model = 'hello' #tf.keras.models.load_model(name_file_model)
 
-        lookback = config['lookback']
-        lookahead = config['lookahead']
-        percent_data = config['percent_data']
-        nb_layers = config['nb_layers']
+        n_clusters = config['n_clusters']
+        n_init = config['n_init']
+        max_iter = config['max_iter']
+        tol = config['tol']
         list_format_column = config['list_format_column']
         mode = config['mode']
 
-        self.old_selection = {'list_format_column':list_format_column[:], 'lookback':lookback, 'lookahead':lookahead, 'nb_layers':nb_layers, 'mode': mode}
-        self.old_percent_data = None
+        self.old_selection = {'list_format_column':list_format_column[:], 'n_clusters':n_clusters, 'n_init':n_init, 'max_iter':max_iter, 'tol': tol}
+        self.old_tol = None
 
-        self.textbox_lookback.setText(str(lookback))
-        self.textbox_lookahead.setText(str(lookahead))
-        self.textbox_percent_data.setText(str(percent_data))
-        self.textbox_nb_layers.setText(str(nb_layers))
-
-        if mode == 'classification':
+        self.textbox_n_clusters.setText(str(n_clusters))
+        self.textbox_n_init.setText(str(n_init))
+        self.textbox_max_iter.setText(str(max_iter))
+        self.textbox_tol.setText(str(tol))
+"""
+        """if mode == 'classification':
             self.checkbox_classification.setChecked(True)
         else:
-            self.checkbox_classification.setChecked(False)
+            self.checkbox_classification.setChecked(False)"""
 
-        for i in range(len(self.listComboBox)):
+        """for i in range(len(self.listComboBox)):
             choose = list_format_column[i]
             index_combo_box = self.dict_items_selectable[choose]
             self.listComboBox[i].setCurrentIndex(index_combo_box)
 
         del self.management_model
-        #self.management_model = ManagementModel()
+        self.management_model = ManagementModel()
         self.management_model.set_config(config, self.data)
         self.management_model.set_dataset(self.data)
         self.management_model.set_model()
 
         self.nb_train = 1
-
+"""
     @pyqtSlot()
     def setTrain(self):
-        """recuperation des données de la l'interface
+        """recuperation des données de l'interface
         """
         list_format_column = []
         for comboBox in self.listComboBox:
             list_format_column.append(comboBox.currentText())
 
-        if list_format_column.count('goal') == 0:
-            print("Aucune colonne goal n'a été sélectionnée")
+        n_clusters = int(self.textbox_n_clusters.toPlainText())
+        n_init = int(self.textbox_n_init.toPlainText())
+        max_iter = int(self.textbox_max_iter.toPlainText())
+        tol = float(self.textbox_tol.toPlainText())
+
+        mode = 'clustering'
+
+        selection = {'list_format_column': list_format_column[:], 'n_clusters': n_clusters, 'n_init': n_init, 'max_iter': max_iter, 'tol': tol, 'mode': mode}
+
+        config = {
+            'list_format_column': list_format_column[:],
+            'n_clusters': n_clusters,
+            'n_init': n_init,
+            'max_iter': max_iter,
+            'tol': tol,
+            'mode': mode,
+            'nb_entries': None
+        }
+        
+        #si c'est la première fois que l'on structure le ML
+        if self.nb_train == 0:
+            self.management_model.set_config(config)
+            #print(type(self.data))
+            self.management_model.set_dataset(self.data)
+            self.management_model.set_model()
+            self.management_model.train()
+            self.management_model.save()
+        elif self.old_selection == selection:
+            # dans le cas où aucun réglages ne modifie la structure du ML
+            # ne lance que l'apprentissage
+            self.management_model.train()
         else:
-            lookback = int(self.textbox_lookback.toPlainText())
-            lookahead = int(self.textbox_lookahead.toPlainText())+1
-            nb_epoch = int(self.textbox_nb_epoch.toPlainText())
-            percent_data = int(self.textbox_percent_data.toPlainText())
-            nb_layers = int(self.textbox_nb_layers.toPlainText())
-            classification = self.checkbox_classification.isChecked()
+            self.nb_train = 0
+            self.management_model.set_config(config, self.data)
+            self.management_model.set_dataset(self.data)
+            self.management_model.set_model()
+            self.management_model.train()
+            self.management_model.save()
+            
+        # enregistre le format pour le comparer avec le prochain apprentissage
+        self.old_selection = {'list_format_column': list_format_column[:], 'n_clusters': n_clusters, 'n_init': n_init, 'max_iter': max_iter, 'tol': tol, 'mode': mode}
+        #self.old_tol = tol
+        
+        if self.management_model.clustering_model.model_is_set:
+            data_out_pd = self.management_model.demo(self.data)
+            data_out_pd.to_csv('temp/out.csv', sep = ';')
 
-            if classification == True:
-                mode = 'classification'
-            else:
-                mode = 'lstm'
-            
-            selection = {'list_format_column':list_format_column[:], 'lookback':lookback, 'lookahead':lookahead, 'nb_layers':nb_layers, 'mode': mode}
-
-            config = {
-                'list_format_column':list_format_column[:],
-                'lookback':lookback,
-                'lookahead':lookahead,
-                'nb_layers':nb_layers,
-                'percent_data': percent_data,
-                'mode': mode,
-                'nb_entries': None
-            }
-            
-            #si c'est la première fois que l'on structure le ML
-            if self.nb_train == 0:
-                self.management_model.set_config(config, self.data)
-                self.management_model.set_dataset(self.data)
-                self.management_model.set_model()
-                self.management_model.train(nb_epoch)
-                self.management_model.save()
-            elif self.old_selection == selection and percent_data == self.old_percent_data:
-                # dans le cas où aucun réglages ne modifie la structure du ML
-                # ne lance que l'apprentissage
-                self.management_model.train(nb_epoch)
-            elif self.old_selection == selection:
-                # dans le cas ou rien ne change sauf le pourcentage ou le nombre d'epoch
-                if self.old_percent_data != percent_data:
-                    self.management_model.set_percent(percent_data)
-                if nb_epoch > 0:
-                    self.management_model.train(nb_epoch)
-                    self.management_model.save()
-            else:
-                self.nb_train = 0
-                self.management_model.set_config(config, self.data)
-                self.management_model.set_dataset(self.data)
-                self.management_model.set_model()
-                self.management_model.train(nb_epoch)
-                self.management_model.save()
-            
-            # enregistre le format pour le comparer avec le prochain apprentissage
-            self.old_selection = {'list_format_column':list_format_column[:], 'lookback':lookback, 'lookahead':lookahead, 'nb_layers':nb_layers, 'mode': mode}
-            self.old_percent_data = percent_data
-            
-            if self.management_model.lstm_model.model_is_set:
-                data_out_pd = self.management_model.demo(self.data,percent_data)
-                data_out_pd.to_csv('temp/out.csv', sep = ';')
-
-            self.nb_train += 1
+        self.nb_train += 1
 
     @pyqtSlot()
     def saveModel(self):
@@ -215,7 +202,7 @@ class App(QWidget):
 
     @pyqtSlot()
     def cleanDataAndSet(self):
-        # anlève l'affichage du dataset précédant
+        # enlève l'affichage du dataset précédent
         self.layout.removeWidget(self.table)
         self.table.deleteLater()
         self.table = None
@@ -297,13 +284,13 @@ class App(QWidget):
         for index, column in enumerate(listColumn, start=0):
             self.format.setItem(0, index, listFormat[index])
             comboBox = QtWidgets.QComboBox()
-            comboBox.addItems(["disable", "number", "status", "timestamp"])
+            comboBox.addItems(["disable", "number", "status", "timestamp", "vibration"])
             self.listComboBox.append(comboBox)
             self.format.setCellWidget(0, index, self.listComboBox[index])
         self.resultat_box.addWidget(self.format)
         self.resultat_box.addWidget(self.table)
 
-        self.dict_items_selectable = {"disable":0, "number":1, "status":2, "timestamp":3}
+        self.dict_items_selectable = {"disable": 0, "number": 1, "status": 2, "timestamp": 3, "vibration": 4}
 
     @pyqtSlot()
     def load_an_other_csv(self):
@@ -319,41 +306,41 @@ class App(QWidget):
     def drawSetTrain(self):
         """affichage pour les réglages
         """
-        self.label_lookback = QLabel("# Clusters")
-        self.textbox_lookback = QTextEdit()
-        self.textbox_lookback.setFixedHeight(25)
-        self.label_lookahead = QLabel("# Runs")
-        self.textbox_lookahead = QTextEdit()
-        self.textbox_lookahead.setFixedHeight(25)
-        self.label_nb_epoch = QLabel("Max # iterations")
-        self.textbox_nb_epoch = QTextEdit()
-        self.textbox_nb_epoch.setFixedHeight(25)
-        self.label_percent_data = QLabel("Tolerance")
-        self.textbox_percent_data = QTextEdit()
-        self.textbox_percent_data.setFixedHeight(25)
-        """self.label_nb_layers = QLabel("Number of layers")
-        self.textbox_nb_layers = QTextEdit()
-        self.textbox_nb_layers.setFixedHeight(25)
+        self.label_n_clusters = QLabel("# Clusters")
+        self.textbox_n_clusters = QTextEdit()
+        self.textbox_n_clusters.setFixedHeight(25)
+        self.label_n_init = QLabel("# Runs")
+        self.textbox_n_init = QTextEdit()
+        self.textbox_n_init.setFixedHeight(25)
+        self.label_max_iter = QLabel("Max # iterations")
+        self.textbox_max_iter = QTextEdit()
+        self.textbox_max_iter.setFixedHeight(25)
+        self.label_tol = QLabel("Tolerance")
+        self.textbox_tol = QTextEdit()
+        self.textbox_tol.setFixedHeight(25)
+        """self.label_max_iter = QLabel("Number of layers")
+        self.textbox_max_iter = QTextEdit()
+        self.textbox_max_iter.setFixedHeight(25)
         self.checkbox_classification = QCheckBox("Classification")
         self.checkbox_classification.setFixedHeight(25)"""
         
-        self.reglage_box.addWidget(self.label_lookback)
-        self.reglage_box.addWidget(self.textbox_lookback)
-        self.reglage_box.addWidget(self.label_lookahead)
-        self.reglage_box.addWidget(self.textbox_lookahead)
-        self.reglage_box.addWidget(self.label_nb_epoch)
-        self.reglage_box.addWidget(self.textbox_nb_epoch)
-        self.reglage_box.addWidget(self.label_percent_data)
-        self.reglage_box.addWidget(self.textbox_percent_data)
-        #self.reglage_box.addWidget(self.label_nb_layers)
-        """self.reglage_box.addWidget(self.textbox_nb_layers)
+        self.reglage_box.addWidget(self.label_n_clusters)
+        self.reglage_box.addWidget(self.textbox_n_clusters)
+        self.reglage_box.addWidget(self.label_n_init)
+        self.reglage_box.addWidget(self.textbox_n_init)
+        self.reglage_box.addWidget(self.label_max_iter)
+        self.reglage_box.addWidget(self.textbox_max_iter)
+        self.reglage_box.addWidget(self.label_tol)
+        self.reglage_box.addWidget(self.textbox_tol)
+        #self.reglage_box.addWidget(self.label_max_iter)
+        """self.reglage_box.addWidget(self.textbox_max_iter)
         self.reglage_box.addWidget(self.checkbox_classification)"""
         
-        self.textbox_lookback.setText("7")
-        self.textbox_lookahead.setText("30")
-        self.textbox_nb_epoch.setText("3")
-        self.textbox_percent_data.setText("95")
-        #self.textbox_nb_layers.setText("3")
+        self.textbox_n_clusters.setText("3")
+        self.textbox_n_init.setText("10")
+        self.textbox_max_iter.setText("300")
+        self.textbox_tol.setText("0.0001")
+        #self.textbox_max_iter.setText("3")
         
         self.button = QPushButton("Run training")
         #self.button_load = QPushButton("Load .json")

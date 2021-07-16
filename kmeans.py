@@ -33,7 +33,7 @@ class KMeansClustering:
 
     def train(self, config, train_x):
         self.config = config
-        name_goal = self.config['name_goal']
+        #name_goal = self.config['name_goal']
         ncluster_silhouette = []
 
         for i in range(2, 10):
@@ -44,19 +44,19 @@ class KMeansClustering:
             # print (f"Silhouette score for k(clusters) = {i} is {score}")
 
         # set le nombre de clusters optimal selon la méthode de la silhouette
-        get_best_k_with_silhouette(ncluster_silhouette)
+        #self.get_best_k_with_silhouette(ncluster_silhouette)
 
         # entraîner kmeans avec le nombre de clusters optimal
         self.config = config
-        n_clusters = self.config['n_clusters']
+        n_clusters = self.get_best_k_with_silhouette(ncluster_silhouette) #self.config['n_clusters']
         n_init = self.config['n_init']
         max_iter = self.config['max_iter']
         tol = self.config['tol']
 
         self.model = KMeans(n_clusters=n_clusters, n_init=n_init, max_iter=max_iter, tol=tol, random_state=42)
-
+        
         # sauvegarder le modèle
-        self.name_file_pkl_save = f'{name_goal}.pkl'
+        self.name_file_pkl_save = f'model_with_{n_clusters}_clusters.pkl'
         with open(self.name_file_pkl_save, 'wb') as file:
             pickle.dump(f'model/{self.model}', file)
         
@@ -72,6 +72,10 @@ class KMeansClustering:
                 break
         return 0
 
+    def predict(self, x):
+        print(f'x: {x}')
+        x['cluster'] = self.model.fit_predict(x[['vibration']])
+        return x
     """def calcul(self, x):
         mode = self.config['mode']
         out = self.model.predict(x)
