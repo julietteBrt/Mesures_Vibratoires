@@ -5,4 +5,11 @@ myenv
 # notebook
 .ipynb_checkpoints
 
+# python
+__pycache__
+
 model/**
+temp/**
+
+Advantec_Vibra.txt
+

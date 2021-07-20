@@ -49,8 +49,7 @@ class ManagementModel:
 
         if 'timestamp' in list_format_column:
             index_goal = list_format_column.index("timestamp")
-            formats = ['%Y-%m-%d %H:%M:%S.%f', '%m/%d/%Y  %H:%M:%S', '%d-%m-%y', '%d-%m-%Y', '%Y-%m-%d', '%b %y', '%B %Y', '%d %B %Y']
-            #print(data)
+            formats = ['%Y-%m-%d %H:%M:%S.%f', '%d/%m/%Y %H:%M','%m/%d/%Y  %H:%M:%S', '%d-%m-%y', '%d-%m-%Y', '%Y-%m-%d', '%b %y', '%B %Y', '%d %B %Y']
             data['timestamp'] = reduce(lambda l, r: l.combine_first(r), [pd.to_datetime(data['timestamp'], format=fmt, errors='coerce') for fmt in formats])
             #print(f'type: {type(data)}')
         #print(data.dtypes)
@@ -74,7 +73,7 @@ class ManagementModel:
 
         if 'timestamp' in list_format_column:
             index_goal = list_format_column.index("timestamp")
-            formats = ['%Y-%m-%d %H:%M:%S.%f', '%m/%d/%Y  %H:%M:%S', '%d-%m-%y', '%d-%m-%Y', '%Y-%m-%d', '%b %y', '%B %Y', '%d %B %Y']
+            formats = ['%Y-%m-%d %H:%M:%S.%f', '%d/%m/%Y %H:%M','%m/%d/%Y  %H:%M:%S', '%d-%m-%y', '%d-%m-%Y', '%Y-%m-%d', '%b %y', '%B %Y', '%d %B %Y']
             data.iloc[:, index_goal] = reduce(lambda l, r: l.combine_first(r), [pd.to_datetime(data.iloc[:, index_goal], format=fmt, errors='coerce') for fmt in formats])
 
             """data.iloc[:, index_goal] =  pd.to_datetime(data.iloc[:, index_goal], errors='coerce', dayfirst=True)
