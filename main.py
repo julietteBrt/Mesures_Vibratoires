@@ -91,45 +91,6 @@ class App(QWidget):
         with open(self.name_file_config, 'rb') as pkl_file: 
             self.management_model.clustering_model = pickle.load(pkl_file)
 
-        """name_file = f"{config['name_goal']}.pkl"
-        dir = os.path.dirname(self.name_file_config)
-        name_file_model = f'{dir}/{name_file}'
-
-        #model = 'hello' #tf.keras.models.load_model(name_file_model)
-
-        n_clusters = config['n_clusters']
-        n_init = config['n_init']
-        max_iter = config['max_iter']
-        tol = config['tol']
-        list_format_column = config['list_format_column']
-        mode = config['mode']
-
-        self.old_selection = {'list_format_column':list_format_column[:], 'n_clusters':n_clusters, 'n_init':n_init, 'max_iter':max_iter, 'tol': tol}
-        self.old_tol = None
-
-        self.textbox_n_clusters.setText(str(n_clusters))
-        self.textbox_n_init.setText(str(n_init))
-        self.textbox_max_iter.setText(str(max_iter))
-        self.textbox_tol.setText(str(tol))
-"""
-        """if mode == 'classification':
-            self.checkbox_classification.setChecked(True)
-        else:
-            self.checkbox_classification.setChecked(False)"""
-
-        """for i in range(len(self.listComboBox)):
-            choose = list_format_column[i]
-            index_combo_box = self.dict_items_selectable[choose]
-            self.listComboBox[i].setCurrentIndex(index_combo_box)
-
-        del self.management_model
-        self.management_model = ManagementModel()
-        self.management_model.set_config(config, self.data)
-        self.management_model.set_dataset(self.data)
-        self.management_model.set_model()
-
-        self.nb_train = 1
-"""
     @pyqtSlot()
     def setTrain(self):
         """recuperation des données de l'interface
@@ -160,7 +121,6 @@ class App(QWidget):
         #si c'est la première fois que l'on structure le ML
         if self.nb_train == 0:
             self.management_model.set_config(config)
-            #print(type(self.data))
             self.management_model.set_dataset(self.data)
             self.management_model.set_model()
             self.management_model.train()
@@ -421,4 +381,3 @@ if __name__ == '__main__':
     app = QApplication([])
     ex = App()
     sys.exit(app.exec_())
-{"mode":"full", "isActive":False}

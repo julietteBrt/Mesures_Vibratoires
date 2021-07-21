@@ -1,6 +1,7 @@
 import sklearn
 from sklearn.cluster import KMeans
 import pickle 
+import datetime
 
 import os
 
@@ -33,7 +34,6 @@ class KMeansClustering:
 
     def train(self, config, train_x):
         self.config = config
-        #name_goal = self.config['name_goal']
         ncluster_silhouette = []
 
         for i in range(2, 10):
@@ -41,14 +41,10 @@ class KMeansClustering:
             kmeans.fit_predict(train_x)
             score = sklearn.metrics.silhouette_score(train_x, kmeans.labels_, metric='euclidean')
             ncluster_silhouette.append(score)
-            # print (f"Silhouette score for k(clusters) = {i} is {score}")
-
-        # set le nombre de clusters optimal selon la méthode de la silhouette
-        #self.get_best_k_with_silhouette(ncluster_silhouette)
 
         # entraîner kmeans avec le nombre de clusters optimal
         self.config = config
-        n_clusters = self.get_best_k_with_silhouette(ncluster_silhouette) #self.config['n_clusters']
+        n_clusters = self.get_best_k_with_silhouette(ncluster_silhouette)
         n_init = self.config['n_init']
         max_iter = self.config['max_iter']
         tol = self.config['tol']
@@ -56,9 +52,9 @@ class KMeansClustering:
         self.model = KMeans(n_clusters=n_clusters, n_init=n_init, max_iter=max_iter, tol=tol, random_state=42)
         
         # sauvegarder le modèle
-        self.name_file_pkl_save = f'model_with_{n_clusters}_clusters.pkl'
+        self.name_file_pkl_save = f'model/{datetime.datetime.now().date()}_model_with_{n_clusters}_clusters.pkl'
         with open(self.name_file_pkl_save, 'wb') as file:
-            pickle.dump(f'model/{self.model}', file)
+            pickle.dump(self.model, file)
         
         self.model_is_trained = True
         return self.model
@@ -72,15 +68,12 @@ class KMeansClustering:
                 break
         return 0
 
-    def predict(self, x):
+    def fit_predict(self, x):
         print(f'x: {x}')
         x['cluster'] = self.model.fit_predict(x[['vibration']])
         return x
-    """def calcul(self, x):
-        mode = self.config['mode']
-        out = self.model.predict(x)
-        if mode == 'classification':
-            out = out.argmax(axis=2)
-            lookahead = self.config['lookahead']
-            out = np.reshape(out, (out.shape[0], 1, lookahead))
-        return out"""
+
+    def predict(self, x):
+        print(f'x: {x}')
+        x['cluster'] = self.model.predict(x[['vibration']])
+        return x

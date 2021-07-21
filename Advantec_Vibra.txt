@@ -42,3 +42,8 @@ Compteur STARTUP_TIMES : dénombre quoi ?
 
 Détecter écart acceptable 
 
+Tracer lignes sur graphe pour matérialiser les valeurs nominales
+Ajouter des valeurs à Prédire
+Sur fenêtre, indiquer la plage de valeurs nominales (celle entre les deux lignes)
+moyenne et max / min des clusters principaux (avec plus grande population)
+
