@@ -47,3 +47,8 @@ Ajouter des valeurs à Prédire
 Sur fenêtre, indiquer la plage de valeurs nominales (celle entre les deux lignes)
 moyenne et max / min des clusters principaux (avec plus grande population)
 
+Normaliser / standardiser les valeurs ?
+
+-------RL-------
+On supposera l'état de santé de l'appareil comme étant l'état initial (au démarrage).
+
