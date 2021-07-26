@@ -51,4 +51,38 @@ Normaliser / standardiser les valeurs ?
 
 -------RL-------
 On supposera l'état de santé de l'appareil comme étant l'état initial (au démarrage).
+Tout un environnement à définir, les états, les actions
+
+Faire en sorte d'adapter le code pour un flux dynamique ?
+A lire :
+https://towardsdatascience.com/deploying-ml-models-in-distributed-real-time-data-streaming-applications-217954a0b423
+
+Intéressant :
+https://github.com/cyoon1729/RLcycle
+https://github.com/medipixel/rl_algorithms
+https://proceedings.neurips.cc/paper/2010/file/091d584fced301b442654dd8c23b3fc9-Paper.pdf
+https://arxiv.org/pdf/2007.03313.pdf
+http://www.acad.bg/rismim/itc/sub/archiv/Paper4_1_2013.pdf
+https://dr.ntu.edu.sg/bitstream/10356/100392/1/Reinforcement%20Learning%20Based%20Predictive%20Maintenance%20for%20a%20Machine%20with%20Multiple%20Deteriorating%20Yield%20Levels.pdf
+
+https://www.learndatasci.com/tutorials/reinforcement-q-learning-scratch-python-openai-gym/
+https://amunategui.github.io/reinforcement-learning/index.html
+http://firsttimeprogrammer.blogspot.com/2016/09/getting-ai-smarter-with-q-learning.html
+
+bot looking for: nominal value 
+obstacles: all the different actions to be taken
+
+modélisation du problème sous forme de graphe ?
+https://towardsdatascience.com/applications-of-reinforcement-learning-in-real-world-1a94955bcd12
+Combined with LSTM to model the policy function, the RL agent optimized the chemical reaction with the Markov 
+decision process (MDP) characterized by {S, A, P, R}, where S was the set of experimental conditions (like 
+temperature, pH, etc), A was the set all possible actions that can change the experimental conditions, P was 
+the transition probability from current experiment condition to the next condition, and R was the reward which 
+is a function of the state.
+PCA pour expliquer vibration totale
+
+on ne vaut pas contrôler l'émission des vibrations mais déterminer la valeur nominale du capteur
+On a des valeurs en entrée et on peut estimer que la moyenne est la valeur nominale mais une valeur trop
+éloignée ne doit pas être prise en compte et doit alerter.
+
 

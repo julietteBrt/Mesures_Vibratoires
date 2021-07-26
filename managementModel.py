@@ -49,7 +49,6 @@ class ManagementModel:
         
         list_format_column = self.config['list_format_column']
         index_vibration = list_format_column.index("vibration")
-
         if 'timestamp' in list_format_column:
             index_goal = list_format_column.index("timestamp")
             formats = ['%Y-%m-%d %H:%M:%S.%f', '%d/%m/%Y %H:%M','%m/%d/%Y  %H:%M:%S', '%d-%m-%y', '%d-%m-%Y', '%Y-%m-%d', '%b %y', '%B %Y', '%d %B %Y']

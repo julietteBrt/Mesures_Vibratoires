@@ -16,12 +16,11 @@ class KMeansClustering:
 
     def set(self, config):
         self.config = config
-        n_clusters = self.config['n_clusters']
         n_init = self.config['n_init']
         max_iter = self.config['max_iter']
         tol = self.config['tol']
 
-        self.model = KMeans(n_clusters=n_clusters, n_init=n_init, max_iter=max_iter, tol=tol, random_state=42)
+        self.model = KMeans(n_init=n_init, max_iter=max_iter, tol=tol, random_state=42)
         self.model_is_set = True
 
     def load(self, config, model):
@@ -69,11 +68,9 @@ class KMeansClustering:
         return 0
 
     def fit_predict(self, x):
-        print(f'x: {x}')
         x['cluster'] = self.model.fit_predict(x[['vibration']])
         return x
 
     def predict(self, x):
-        print(f'x: {x}')
         x['cluster'] = self.model.predict(x[['vibration']])
         return x

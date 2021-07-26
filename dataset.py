@@ -48,7 +48,7 @@ class Dataset:
         for i in range(list_format_column.count('disable')):
             list_format_column.remove("disable")
         
-        # renome les colonnes en fonction de leur type
+        # renomme les colonnes en fonction de leur type
         data.columns = list_format_column
         
         # tri par date
@@ -105,7 +105,6 @@ class Dataset:
             data_cleaned = data_cleaned.join(goal_one_hot)
 
         del list_data_one_hot
-        print(f'DATASET: {type(data_cleaned)}')
         return data_cleaned
 
     def create_dataset(self, data):

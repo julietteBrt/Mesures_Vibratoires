@@ -99,18 +99,16 @@ class App(QWidget):
         for comboBox in self.listComboBox:
             list_format_column.append(comboBox.currentText())
 
-        n_clusters = int(self.textbox_n_clusters.toPlainText())
         n_init = int(self.textbox_n_init.toPlainText())
         max_iter = int(self.textbox_max_iter.toPlainText())
         tol = float(self.textbox_tol.toPlainText())
 
         mode = 'clustering'
 
-        selection = {'list_format_column': list_format_column[:], 'n_clusters': n_clusters, 'n_init': n_init, 'max_iter': max_iter, 'tol': tol, 'mode': mode}
+        selection = {'list_format_column': list_format_column[:], 'n_init': n_init, 'max_iter': max_iter, 'tol': tol, 'mode': mode}
 
         config = {
             'list_format_column': list_format_column[:],
-            'n_clusters': n_clusters,
             'n_init': n_init,
             'max_iter': max_iter,
             'tol': tol,
@@ -138,7 +136,7 @@ class App(QWidget):
             self.management_model.save()
             
         # enregistre le format pour le comparer avec le prochain apprentissage
-        self.old_selection = {'list_format_column': list_format_column[:], 'n_clusters': n_clusters, 'n_init': n_init, 'max_iter': max_iter, 'tol': tol, 'mode': mode}
+        self.old_selection = {'list_format_column': list_format_column[:], 'n_init': n_init, 'max_iter': max_iter, 'tol': tol, 'mode': mode}
         #self.old_tol = tol
         
         if self.management_model.clustering_model.model_is_set:
@@ -266,9 +264,6 @@ class App(QWidget):
     def drawSetTrain(self):
         """affichage pour les réglages
         """
-        self.label_n_clusters = QLabel("# Clusters")
-        self.textbox_n_clusters = QTextEdit()
-        self.textbox_n_clusters.setFixedHeight(25)
         self.label_n_init = QLabel("# Runs")
         self.textbox_n_init = QTextEdit()
         self.textbox_n_init.setFixedHeight(25)
@@ -278,39 +273,24 @@ class App(QWidget):
         self.label_tol = QLabel("Tolerance")
         self.textbox_tol = QTextEdit()
         self.textbox_tol.setFixedHeight(25)
-        """self.label_max_iter = QLabel("Number of layers")
-        self.textbox_max_iter = QTextEdit()
-        self.textbox_max_iter.setFixedHeight(25)
-        self.checkbox_classification = QCheckBox("Classification")
-        self.checkbox_classification.setFixedHeight(25)"""
         
-        self.reglage_box.addWidget(self.label_n_clusters)
-        self.reglage_box.addWidget(self.textbox_n_clusters)
         self.reglage_box.addWidget(self.label_n_init)
         self.reglage_box.addWidget(self.textbox_n_init)
         self.reglage_box.addWidget(self.label_max_iter)
         self.reglage_box.addWidget(self.textbox_max_iter)
         self.reglage_box.addWidget(self.label_tol)
         self.reglage_box.addWidget(self.textbox_tol)
-        #self.reglage_box.addWidget(self.label_max_iter)
-        """self.reglage_box.addWidget(self.textbox_max_iter)
-        self.reglage_box.addWidget(self.checkbox_classification)"""
         
-        self.textbox_n_clusters.setText("3")
         self.textbox_n_init.setText("10")
         self.textbox_max_iter.setText("300")
         self.textbox_tol.setText("0.0001")
-        #self.textbox_max_iter.setText("3")
         
         self.button = QPushButton("Run training")
-        #self.button_load = QPushButton("Load .json")
-        self.button_csv = QPushButton("Load an other csv")
+        self.button_csv = QPushButton("Load another csv")
         self.reglage_box.addWidget(self.button)
-        #self.reglage_box.addWidget(self.button_load)
         self.reglage_box.addWidget(self.button_csv)
         
         self.button.clicked.connect(self.setTrain)
-        #self.button_load.clicked.connect(self.selectSaveModel)
         self.button_csv.clicked.connect(self.load_an_other_csv)
 
 
