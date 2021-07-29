@@ -21,3 +21,9 @@ $ pip install -r requirements.txt
 ```
 $ main.py
 ```
+
+## Notebook
+```
+$ Mesure_Vibratoire.ipynb
+```
+Ce notebook donne des explications sur les méthodes employées dans l'application mais aussi de générer un fichier de données .csv à partir des deux fichiers fournis en entrée. Il est possible de tester le code avec des données d'entrée différentes, deux relevés sont fournis.
